@@ -15,6 +15,14 @@ for line in open("data.txt"):
     y.append(b)
     m+=1
 
+def leastSquares():
+    sumX = sum(x)
+    sumY = sum(y)
+    sumXY = sum([xi * yi for xi , yi in zip(x, y)])
+    sumX2 = sum([xi ** 2 for xi in x])
+    slope = (m * sumXY - sumX * sumY)/(m * sumX2 - sumX ** 2)
+    offset = (sumY - slope * sumX)/m
+    print(f"slope = {slope}, offset = {offset}")
 
 def cost(t0, t1):
     cost = 0.0
@@ -44,6 +52,7 @@ while (change() >= epsilon):
     theta1 = theta1 - alpha * delta1
 
 print(f"The final error is {cost(theta0, theta1)}")
+leastSquares()
 
 plt.scatter(x,y)
 plt.plot(x, [theta0 + xi * theta1 for xi in x], color='red')
