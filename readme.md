@@ -4,10 +4,12 @@ The only required dependency is matplotlib, I tested both matplotlib 3.7.2 and 3
 
 data.txt is also required to be in the same directory as the source file as shown below:
 
+```
 BenObryanHW1/
 ├── data.txt
 ├── linearRegression.py
 └── readme.md
+```
 
 The command to run this program should be something like 
 `<path to python executable> < path to linearRegression.py>`
