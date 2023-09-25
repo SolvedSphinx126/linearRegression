@@ -43,14 +43,14 @@ def gradient(theta, x, y):
     offsets = []
     locm = len(x)
     for i in range(0, len(theta)):
-        offsets.append(-alpha * (1 / locm) * np.sum([hypothesis(x[j]) - y[j] * x[j][i] for j in range(1, locm)]))
+        offsets.append(-alpha * (1 / locm) * np.sum([(hypothesis(x[j]) - y[j]) * x[j][i] for j in range(1, locm)]))
     return offsets
 
 
 theta = np.zeros((2, 1))
 x = np.array(data[["DIS", "RAD"]])
 y = np.array(data[["NOX"]])
-for _ in range(1, 20):
+for _ in range(1, 100):
     offsets = gradient(theta, x, y)
     for i in range(0,len(theta)):
         theta[i] += offsets[i]
