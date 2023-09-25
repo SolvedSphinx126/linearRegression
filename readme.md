@@ -1,6 +1,9 @@
 This program was tested on Ubuntu (WSL) and Windows with Python 3.10
 
-The only required dependency is matplotlib, I tested both matplotlib 3.7.2 and 3.7.3
+This program depends on:
+    matplotlib
+    numpy
+    pandas
 
 data.txt is also required to be in the same directory as the source file as shown below:
 

@@ -13,8 +13,16 @@ theta = np.array([])    # column vector of hypothesis
 
 # Read data from the "data.txt" file and populate data list
 data = pd.read_csv("data.csv")
-x = data[["NOX"]]
-y = data.drop(columns=["NOX"])
+means = []
+stddevs = []
+for col in data:
+    for row in data.index.values:
+        data[col][row] = (data[col][row] - np.mean(data[col])) / np.std(data[col])
+
+data.to_csv("normalized_data.csv")
+
+#x = data[["NOX"]]
+#y = data[["DIS"], ["RAD"]]
 
 # Define the cost function for linear regression
 def J(theta, x, y, m):
