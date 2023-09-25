@@ -11,7 +11,7 @@ alpha = 0.01    # Learning rate for gradient descent
 theta = np.array([])    # column vector of hypothesis
 
 
-# Read data from the "data.txt" file and populate data list
+# Read data from the "data.txt" file and populate data list with normalized data
 data = pd.read_csv("data.csv")
 means = []
 stddevs = []
@@ -32,25 +32,16 @@ def J(theta, x, y, m):
 def hypothesis(theta, x):
     return np.matmul(theta.T, x)[0][0]
 
-# TODO: Find Gradient of all vars
-# Calculate the gradient for theta0 (intercept)
-def d0():
-    sum = 0
-    for i in range(0,m):
-        sum += hypothesis(x[i]) - y[i]
-    return (1/m) * sum
-
-# Calculate the gradient for theta1 (slope)
-def d1():
-    sum = 0
-    for i in range(0,m):
-        sum += (hypothesis(x[i]) - y[i]) * x[i]
-    return (1/m) * sum
+# Calculate the gradient for theta (slope)
+def gradient(theta, x, y):
+    offsets = []
+    for t in theta:
+        offsets.append(-alpha*(1/m)*np.sum([hypothesis(x[i]-y[i])*x[i] for i in range(0,m)]))
+        return offsets
 
 # Calculate the convergence parameter for gradient descent
 def convergenceParam():
     return math.sqrt((-alpha * d0())**2 + (-alpha * d1())**2)
 
-t = np.array([[1],[2],[3]])
-x = np.array([[4],[5],[6]])
-print(hypothesis(t, x))
+
+
