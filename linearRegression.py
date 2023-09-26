@@ -9,10 +9,14 @@ m = 0  # Number of data points
 epsilon = 0.001  # Convergence threshold for gradient descent
 alpha = 0.01  # Learning rate for gradient descent
 theta = np.array([])  # column vector of hypothesis
+percentTraining = 90 # Percent of data to be used for training
 
 # Read data from the "data.txt" file and populate ndata frame with normalized data
 data = pd.read_csv("data.csv")
 nData = data.apply(lambda col : [(x - np.mean(col)) / np.std(col) for x in col], raw=True)
+
+trainingData = nData.iloc[0:math.floor(nData.shape[0] * (percentTraining / 100))]
+validationData = nData.iloc[math.floor(nData.shape[0] * (percentTraining / 100)):]
 
 nData.to_csv("normalized_data.csv")
 
@@ -51,8 +55,8 @@ def calcConvergence(oldThetas, newThetas):
 
 
 prevTheta = np.zeros((2, 1))
-x = np.array(nData[["DIS", "RAD"]])
-y = np.array(nData[["NOX"]])
+x = np.array(trainingData[["DIS", "RAD"]])
+y = np.array(trainingData[["NOX"]])
 
 # Calculate the first delta theta before entering the loop
 theta = np.zeros((2, 1))
