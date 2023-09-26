@@ -15,8 +15,8 @@ percentTraining = 90 # Percent of data to be used for training
 data = pd.read_csv("data.csv")
 nData = data.apply(lambda col : [(x - np.mean(col)) / np.std(col) for x in col], raw=True)
 
-trainingData = nData.iloc[0:math.floor(nData.shape[0] * (percentTraining / 100))]
-validationData = nData.iloc[math.floor(nData.shape[0] * (percentTraining / 100)):]
+trainingData = nData.iloc[0:math.ceil(nData.shape[0] * (percentTraining / 100))]
+validationData = nData.iloc[math.ceil(nData.shape[0] * (percentTraining / 100)):]
 
 nData.to_csv("normalized_data.csv")
 
