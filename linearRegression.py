@@ -6,7 +6,7 @@ import numpy as np
 
 # Initialize empty lists and variables
 m = 0  # Number of data points
-epsilon = 0.01  # Convergence threshold for gradient descent
+epsilon = 0.000001  # Convergence threshold for gradient descent
 alpha = 0.01  # Learning rate for gradient descent
 theta = np.array([])  # column vector of hypothesis
 
@@ -28,12 +28,12 @@ data.to_csv("normalized_data.csv")
 def J(theta, x, y, m):
     sum = 0
     for i in range(0, len(x)):
-        sum += (hypothesis(x[i]) - y[i]) ** 2
+        sum += (hypothesis(x[i], theta) - y[i]) ** 2
     return (1 / (2 * m)) * sum
 
 
 # Define the hypothesis function for linear regression
-def hypothesis(x):
+def hypothesis(x, theta):
     x = x.reshape((2, 1))
     return np.matmul(theta.T, x)[0][0]
 
@@ -43,15 +43,37 @@ def gradient(theta, x, y):
     offsets = []
     locm = len(x)
     for i in range(0, len(theta)):
-        offsets.append(-alpha * (1 / locm) * np.sum([(hypothesis(x[j]) - y[j]) * x[j][i] for j in range(1, locm)]))
+        offsets.append(-alpha * (1 / locm) * np.sum([(hypothesis(x[j], theta) - y[j]) * x[j][i] for j in range(1, locm)]))
     return offsets
 
+# Return the calculated squared difference between the old and new theta
+def calcConvergence(oldThetas, newThetas):
+    sum = 0
+    for i in range(0, len(oldThetas)):
+        sum += (newThetas[i] - oldThetas[i]) ** 2
+    return sum ** 0.5
 
-theta = np.zeros((2, 1))
+
+prevTheta = np.zeros((2, 1))
 x = np.array(data[["DIS", "RAD"]])
 y = np.array(data[["NOX"]])
-for _ in range(1, 100):
+
+# Calculate the first delta theta before entering the loop
+theta = np.zeros((2, 1))
+offsets = gradient(theta, x, y)
+for i in range(0,len(theta)):
+    theta[i] += offsets[i]
+
+# Perform gadient decent until accuracy reached
+while calcConvergence(prevTheta, theta) > epsilon:
+    # Store the current theta before updating it
+    for i in range(0, len(theta)):
+        prevTheta[i] = theta[i]
+    # Update the thetas
     offsets = gradient(theta, x, y)
     for i in range(0,len(theta)):
         theta[i] += offsets[i]
-    print(J(theta, x, y, len(x)))
+    print(f"Cost         : {J(theta, x, y, len(x))}")
+    print(f"Delta Thetas : {calcConvergence(prevTheta, theta)}")
+
+
