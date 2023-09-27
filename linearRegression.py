@@ -11,8 +11,44 @@ alpha = 0.01  # Learning rate for gradient descent
 theta = np.array([])  # column vector of hypothesis
 percentTraining = 90 # Percent of data to be used for training
 
-# Read data from the "data.txt" file and populate ndata frame with normalized data
-data = pd.read_csv("data.csv")
+# Open the file as read only
+inFile = open("boston.txt", "r")
+fileLines = inFile.readlines()
+varLabels = []
+rawDataVals = []
+
+line = fileLines[0]
+i = 0
+# Skip over everything till the first blank line
+while line != "\n":
+    i += 1
+    line = fileLines[i]
+# Skip the blank line and the line announcing the variables
+i += 2
+line = fileLines[i]
+# Loop over all the variable labels
+while line != "\n":
+    i += 1
+    varLabels.append(line.split()[0])
+    line = fileLines[i]
+# Skip the new line
+i += 1
+# Loop over the data values and put them all into an array
+for index in range(i, len(fileLines)):
+    line = fileLines[index]
+    for val in line.split():
+        rawDataVals.append(float(val))
+
+formattedDataVals = []
+i = 0
+# Turn the 1d array into a 2d array
+while i < len(rawDataVals):
+    formattedDataVals.append([rawDataVals[j] for j in range(i, i + len(varLabels))])
+    i += len(varLabels)
+
+data = pd.DataFrame(formattedDataVals, columns=varLabels, dtype=float)
+
+# Normalize the dataset
 nData = data.apply(lambda col : [(x - np.mean(col)) / np.std(col) for x in col], raw=True)
 
 trainingData = nData.iloc[0:math.ceil(nData.shape[0] * (percentTraining / 100))]
