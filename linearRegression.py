@@ -54,9 +54,6 @@ nData = data.apply(lambda col : [(x - np.mean(col)) / np.std(col) for x in col],
 trainingData = nData.iloc[0:math.ceil(nData.shape[0] * (percentTraining / 100))]
 validationData = nData.iloc[math.ceil(nData.shape[0] * (percentTraining / 100)):]
 
-nData.to_csv("normalized_data.csv")
-
-
 # x = data[["NOX"]]
 # y = data[["DIS"], ["RAD"]]
 
@@ -116,4 +113,25 @@ while calcConvergence(prevTheta, theta) > epsilon:
     print(f"Delta Thetas : {calcConvergence(prevTheta, theta)}")
     print()
 
+def getCost(x, y):
+    theta = np.zeroes(len(x), len(y))
+    prevTheta = np.zeroes(len(x), len(y))
+    offsets = gradient(theta, x, y)
+    for i in range(0, len(theta)):
+        theta[i] += offsets[i]
+
+    iterationCount = 0
+    while calcConvergence(prevTheta, theta) > epsilon:
+        iterationCount += 1
+        # Store the current theta before updating it
+        for i in range(0, len(theta)):
+            prevTheta[i] = theta[i]
+        # Update the thetas
+        offsets = gradient(theta, x, y)
+        for i in range(0,len(theta)):
+            theta[i] += offsets[i]
+        print(f"Iteration Count: {iterationCount}")
+        print(f"Cost         : {J(theta, x, y, len(x))}")
+        print(f"Delta Thetas : {calcConvergence(prevTheta, theta)}")
+        print()
 
