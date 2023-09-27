@@ -100,8 +100,10 @@ offsets = gradient(theta, x, y)
 for i in range(0,len(theta)):
     theta[i] += offsets[i]
 
+iterationCount = 0
 # Perform gadient decent until accuracy reached
 while calcConvergence(prevTheta, theta) > epsilon:
+    iterationCount += 1
     # Store the current theta before updating it
     for i in range(0, len(theta)):
         prevTheta[i] = theta[i]
@@ -109,7 +111,9 @@ while calcConvergence(prevTheta, theta) > epsilon:
     offsets = gradient(theta, x, y)
     for i in range(0,len(theta)):
         theta[i] += offsets[i]
+    print(f"Iteration Count: {iterationCount}")
     print(f"Cost         : {J(theta, x, y, len(x))}")
     print(f"Delta Thetas : {calcConvergence(prevTheta, theta)}")
+    print()
 
 
