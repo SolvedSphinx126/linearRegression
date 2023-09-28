@@ -67,7 +67,7 @@ def J(theta, x, y, m):
 
 # Define the hypothesis function for linear regression
 def hypothesis(x, theta):
-    x = x.reshape((2, 1))
+    x = x.reshape((len(x), 1))
     return np.matmul(theta.T, x)[0][0]
 
 
@@ -86,34 +86,7 @@ def calcConvergence(oldThetas, newThetas):
         sum += (newThetas[i] - oldThetas[i]) ** 2
     return sum ** 0.5
 
-
-
-x = np.array(trainingData[["DIS", "RAD"]])
-y = np.array(trainingData[["NOX"]])
-"""
-# Calculate the first delta theta before entering the loop
-prevTheta = np.zeros((2, 1))
-theta = np.zeros((2, 1))
-offsets = gradient(theta, x, y)
-for i in range(0,len(theta)):
-    theta[i] += offsets[i]
-
-iterationCount = 0
-# Perform gadient decent until accuracy reached
-while calcConvergence(prevTheta, theta) > epsilon:
-    iterationCount += 1
-    # Store the current theta before updating it
-    for i in range(0, len(theta)):
-        prevTheta[i] = theta[i]
-    # Update the thetas
-    offsets = gradient(theta, x, y)
-    for i in range(0,len(theta)):
-        theta[i] += offsets[i]
-    print(f"Iteration Count: {iterationCount}")
-    print(f"Cost         : {J(theta, x, y, len(x))}")
-    print(f"Delta Thetas : {calcConvergence(prevTheta, theta)}")
-    print()
-"""
+#Return the predictied cost after iterating until acceptable error
 def getCost(x, y):
     theta = np.zeros((len(x[0]), len(y[0])))
     prevTheta = theta.copy()
@@ -131,9 +104,25 @@ def getCost(x, y):
         offsets = gradient(theta, x, y)
         for i in range(0,len(theta)):
             theta[i] += offsets[i]
-        print(f"Iteration Count: {iterationCount}")
-        print(f"Cost         : {J(theta, x, y, len(x))}")
-        print(f"Delta Thetas : {calcConvergence(prevTheta, theta)}")
-        print()
+    print(f"Iteration Count: {iterationCount}")
+    print(f"Cost         : {J(theta, x, y, len(x))}")
+    print(f"Delta Thetas : {calcConvergence(prevTheta, theta)}")
+    print()
 
+#NOX prediction with DIS and RAD
+x = np.array(trainingData[["DIS", "RAD"]])
+y = np.array(trainingData[["NOX"]])
+getCost(x,y)
+
+#NOX predicition with all variables
+x = np.array(trainingData[["CRIM", "ZN", "INDUS", "CHAS", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT", "MEDV"]])
+getCost(x,y)
+
+#MEDV predicition with AGE and TAX
+x = np.array(trainingData[["AGE", "TAX"]])
+y = np.array(trainingData[["MEDV"]])
+getCost(x,y)
+
+#MEDV prediction with all variables
+x = np.array(trainingData[["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT"]])
 getCost(x,y)
