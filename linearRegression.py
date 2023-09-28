@@ -54,9 +54,6 @@ nData = data.apply(lambda col : [(x - np.mean(col)) / np.std(col) for x in col],
 trainingData = nData.iloc[0:math.ceil(nData.shape[0] * (percentTraining / 100))]
 validationData = nData.iloc[math.ceil(nData.shape[0] * (percentTraining / 100)):]
 
-# x = data[["NOX"]]
-# y = data[["DIS"], ["RAD"]]
-
 # Define the cost function for linear regression
 def J(theta, x, y, m):
     sum = 0
@@ -64,12 +61,10 @@ def J(theta, x, y, m):
         sum += (hypothesis(x[i], theta) - y[i]) ** 2
     return (1 / (2 * m)) * sum
 
-
 # Define the hypothesis function for linear regression
 def hypothesis(x, theta):
     x = x.reshape((len(x), 1))
     return np.matmul(theta.T, x)[0][0]
-
 
 # Calculate the gradient for theta (slope)
 def gradient(theta, x, y):
@@ -87,7 +82,7 @@ def calcConvergence(oldThetas, newThetas):
     return sum ** 0.5
 
 #Print the predictied cost after iterating until acceptable error
-def getCost(x, y):
+def train(x, y):
     theta = np.zeros((len(x[0]) + 1, len(y[0])))
     # Create a new list so as to not modify the one passed in
     ix = np.concatenate(((np.ones((x.shape[0], 1), dtype=x.dtype)), x), axis=1)
@@ -111,21 +106,22 @@ def getCost(x, y):
     print(f"Cost         : {J(theta, ix, y, len(ix))}")
     print(f"Delta Thetas : {calcConvergence(prevTheta, theta)}")
     print()
+    return theta
 
 #NOX prediction with DIS and RAD
 x = np.array(trainingData[["DIS", "RAD"]])
 y = np.array(trainingData[["NOX"]])
-getCost(x,y)
+theta = train(x,y)
 
 #NOX predicition with all variables
 x = np.array(trainingData[["CRIM", "ZN", "INDUS", "CHAS", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT", "MEDV"]])
-getCost(x,y)
+theta = train(x,y)
 
 #MEDV predicition with AGE and TAX
 x = np.array(trainingData[["AGE", "TAX"]])
 y = np.array(trainingData[["MEDV"]])
-getCost(x,y)
+theta = train(x,y)
 
 #MEDV prediction with all variables
 x = np.array(trainingData[["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT"]])
-getCost(x,y)
+theta = train(x,y)
