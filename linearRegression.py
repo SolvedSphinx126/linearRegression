@@ -88,7 +88,9 @@ def calcConvergence(oldThetas, newThetas):
 
 #Return the predictied cost after iterating until acceptable error
 def getCost(x, y):
-    theta = np.zeros((len(x[0]), len(y[0])))
+    theta = np.zeros((len(x[0]) + 1, len(y[0])))
+    x = np.concatenate(((np.ones((x.shape[0], 1), dtype=x.dtype)), x), axis=1)
+
     prevTheta = theta.copy()
     offsets = gradient(theta, x, y)
     for i in range(0, len(theta)):
