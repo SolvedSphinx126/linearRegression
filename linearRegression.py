@@ -114,8 +114,8 @@ while calcConvergence(prevTheta, theta) > epsilon:
     print()
 
 def getCost(x, y):
-    theta = np.zeroes(len(x), len(y))
-    prevTheta = np.zeroes(len(x), len(y))
+    theta = np.zeros(len(x), len(y))
+    prevTheta = np.zeros(len(x), len(y))
     offsets = gradient(theta, x, y)
     for i in range(0, len(theta)):
         theta[i] += offsets[i]
