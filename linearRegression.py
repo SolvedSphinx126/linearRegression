@@ -55,11 +55,11 @@ trainingData = nData.iloc[0:math.ceil(nData.shape[0] * (percentTraining / 100))]
 validationData = nData.iloc[math.ceil(nData.shape[0] * (percentTraining / 100)):]
 
 # Define the cost function for linear regression
-def J(theta, x, y, m):
+def J(theta, x, y):
     sum = 0
     for i in range(0, len(x)):
         sum += (hypothesis(x[i], theta) - y[i]) ** 2
-    return (1 / (2 * m)) * sum
+    return (1 / (2 * len(x))) * sum
 
 # Define the hypothesis function for linear regression
 def hypothesis(x, theta):
@@ -103,10 +103,16 @@ def gradientDescent(x, y):
         for i in range(0,len(theta)):
             theta[i] += offsets[i]
     print(f"Iteration Count: {iterationCount}")
-    print(f"Cost         : {J(theta, ix, y, len(ix))}")
+    print(f"Cost         : {J(theta, ix, y)}")
     print(f"Delta Thetas : {calcConvergence(prevTheta, theta)}")
     print()
     return theta
+
+#Calculates the squared error in the open form.
+def openSquaredError(x, y, theta):
+    # Create a new list so as to not modify the one passed in
+    ix = np.concatenate(((np.ones((x.shape[0], 1), dtype=x.dtype)), x), axis=1)
+    return J(theta, ix, y)
 
 # Return the theta vector that best fits the data
 def bestFit(x, y):
@@ -114,20 +120,57 @@ def bestFit(x, y):
     ix = np.concatenate(((np.ones((x.shape[0], 1), dtype=x.dtype)), x), axis=1)
     return np.matmul(np.matmul(np.linalg.inv(np.matmul(ix.T, ix)), ix.T), y)
 
-#NOX prediction with DIS and RAD
+
+
+#NOX theta prediction with DIS and RAD training sets
 x = np.array(trainingData[["DIS", "RAD"]])
 y = np.array(trainingData[["NOX"]])
 theta = gradientDescent(x,y)
 
+#NOX open form squared error prediction with validation set of 2 variables
+x = np.array(validationData[["DIS", "RAD"]])
+y = np.array(validationData[["NOX"]])
+print(f"Open form Mean Squared Error, NOX with 2 variables:     {openSquaredError(x, y, theta)}")
+print()
+
+
+
 #NOX predicition with all variables
 x = np.array(trainingData[["CRIM", "ZN", "INDUS", "CHAS", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT", "MEDV"]])
+y = np.array(trainingData[["NOX"]])
 theta = gradientDescent(x,y)
+
+#NOX open form squared error prediction with validation set of all variables
+x = np.array(validationData[["CRIM", "ZN", "INDUS", "CHAS", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT", "MEDV"]])
+y = np.array(validationData[["NOX"]])
+openSquaredError(x, y, theta)
+print(f"Open form Mean Squared Error, NOX with all variables:     {openSquaredError(x, y, theta)}")
+print()
+
+
 
 #MEDV predicition with AGE and TAX
 x = np.array(trainingData[["AGE", "TAX"]])
 y = np.array(trainingData[["MEDV"]])
 theta = gradientDescent(x,y)
 
+#MEDV open form squared error prediction with validation set of 2 variables
+x = np.array(validationData[["AGE", "TAX"]])
+y = np.array(validationData[["MEDV"]])
+openSquaredError(x, y, theta)
+print(f"Open form Mean Squared Error, MEDV with 2 variables:     {openSquaredError(x, y, theta)}")
+print()
+
+
+
 #MEDV prediction with all variables
 x = np.array(trainingData[["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT"]])
+y = np.array(trainingData[["MEDV"]])
 theta = gradientDescent(x,y)
+
+#MEDV open form squared error prediction with validation set of all variables
+x = np.array(validationData[["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT"]])
+y = np.array(validationData[["MEDV"]])
+openSquaredError(x, y, theta)
+print(f"Open form Mean Squared Error, MEDV with 2 variables:     {openSquaredError(x, y, theta)}")
+print()
