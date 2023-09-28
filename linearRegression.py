@@ -87,11 +87,12 @@ def calcConvergence(oldThetas, newThetas):
     return sum ** 0.5
 
 
-prevTheta = np.zeros((2, 1))
+
 x = np.array(trainingData[["DIS", "RAD"]])
 y = np.array(trainingData[["NOX"]])
-
+"""
 # Calculate the first delta theta before entering the loop
+prevTheta = np.zeros((2, 1))
 theta = np.zeros((2, 1))
 offsets = gradient(theta, x, y)
 for i in range(0,len(theta)):
@@ -112,10 +113,10 @@ while calcConvergence(prevTheta, theta) > epsilon:
     print(f"Cost         : {J(theta, x, y, len(x))}")
     print(f"Delta Thetas : {calcConvergence(prevTheta, theta)}")
     print()
-
+"""
 def getCost(x, y):
-    theta = np.zeros(len(x), len(y))
-    prevTheta = np.zeros(len(x), len(y))
+    theta = np.zeros((len(x[0]), len(y[0])))
+    prevTheta = theta.copy()
     offsets = gradient(theta, x, y)
     for i in range(0, len(theta)):
         theta[i] += offsets[i]
@@ -135,3 +136,4 @@ def getCost(x, y):
         print(f"Delta Thetas : {calcConvergence(prevTheta, theta)}")
         print()
 
+getCost(x,y)
