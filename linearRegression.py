@@ -81,8 +81,8 @@ def calcConvergence(oldThetas, newThetas):
         sum += (newThetas[i] - oldThetas[i]) ** 2
     return sum ** 0.5
 
-#Print the predictied cost after iterating until acceptable error
-def train(x, y):
+# Return theta vector trained by gradient descent
+def gradientDescent(x, y):
     theta = np.zeros((len(x[0]) + 1, len(y[0])))
     # Create a new list so as to not modify the one passed in
     ix = np.concatenate(((np.ones((x.shape[0], 1), dtype=x.dtype)), x), axis=1)
@@ -108,20 +108,26 @@ def train(x, y):
     print()
     return theta
 
+# Return the theta vector that best fits the data
+def bestFit(x, y):
+    # Create a new list so as to not modify the one passed in
+    ix = np.concatenate(((np.ones((x.shape[0], 1), dtype=x.dtype)), x), axis=1)
+    return np.matmul(np.matmul(np.linalg.inv(np.matmul(ix.T, ix)), ix.T), y)
+
 #NOX prediction with DIS and RAD
 x = np.array(trainingData[["DIS", "RAD"]])
 y = np.array(trainingData[["NOX"]])
-theta = train(x,y)
+theta = gradientDescent(x,y)
 
 #NOX predicition with all variables
 x = np.array(trainingData[["CRIM", "ZN", "INDUS", "CHAS", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT", "MEDV"]])
-theta = train(x,y)
+theta = gradientDescent(x,y)
 
 #MEDV predicition with AGE and TAX
 x = np.array(trainingData[["AGE", "TAX"]])
 y = np.array(trainingData[["MEDV"]])
-theta = train(x,y)
+theta = gradientDescent(x,y)
 
 #MEDV prediction with all variables
 x = np.array(trainingData[["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT"]])
-theta = train(x,y)
+theta = gradientDescent(x,y)
