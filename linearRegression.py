@@ -47,11 +47,13 @@ while i < len(rawDataVals):
 
 data = pd.DataFrame(formattedDataVals, columns=varLabels, dtype=float)
 
-# Normalize the dataset
-nData = data.apply(lambda col : [(x - np.mean(col)) / np.std(col) for x in col], raw=True)
+# Split the dataset
+trainingData = (data.iloc[0:math.ceil(data.shape[0] * (percentTraining / 100))])
+validationData = (data.iloc[math.ceil(data.shape[0] * (percentTraining / 100)):])
 
-trainingData = nData.iloc[0:math.ceil(nData.shape[0] * (percentTraining / 100))]
-validationData = nData.iloc[math.ceil(nData.shape[0] * (percentTraining / 100)):]
+# Normalize the datasets
+nTrainingData = trainingData.apply(lambda col : [(x - np.mean(col)) / (np.std(col) if np.std(col) != 0 else 1) for x in col], raw=True)
+nValidationData = validationData.apply(lambda col : [(x - np.mean(col)) / (np.std(col) if np.std(col) != 0 else 1) for x in col], raw=True)
 
 # Define the cost function for linear regression
 def J(theta, x, y):
@@ -134,16 +136,16 @@ outFile = open("Output.txt", "w")
 outLines = []
 
 #NOX theta prediction with DIS and RAD training sets
-x = np.array(trainingData[["DIS", "RAD"]])
-y = np.array(trainingData[["NOX"]])
+x = np.array(nTrainingData[["DIS", "RAD"]])
+y = np.array(nTrainingData[["NOX"]])
 print("Performing gradient descent with x = DIS, RAD and y = NOX")
 theta = gradientDescent(x,y)
 
 outLines.append("--- Predicting NOX based on DIS and RAD with gradient descent ---\n")
 outLines.append(f"   Theta Vector               : {[theta[i][0] for i in range(len(theta))]}\n") # so that stuff prints on one line
 outLines.append(f"   Mean Squared Error (TRAINING DATA)   : {meanSquaredError(x, y, theta)}\n")
-x = np.array(validationData[["DIS", "RAD"]])
-y = np.array(validationData[["NOX"]])
+x = np.array(nValidationData[["DIS", "RAD"]])
+y = np.array(nValidationData[["NOX"]])
 outLines.append(f"   Mean Squared Error (VALIDATION DATA) : {meanSquaredError(x, y, theta)}\n")
 outLines.append("\n")
 outFile.writelines(outLines)
@@ -155,8 +157,8 @@ print()
 
 
 #NOX predicition with all variables
-x = np.array(trainingData[["CRIM", "ZN", "INDUS", "CHAS", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT", "MEDV"]])
-y = np.array(trainingData[["NOX"]])
+x = np.array(nTrainingData[["CRIM", "ZN", "INDUS", "CHAS", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT", "MEDV"]])
+y = np.array(nTrainingData[["NOX"]])
 print("Performing gradient descent with x = CRIM, ZN, INDUS, CHAS, RM, AGE, DIS, RAD, TAX, PTRATIO, B, LSTAT, MEDV and y = NOX")
 theta = gradientDescent(x,y)
 
@@ -164,8 +166,8 @@ outLines = []
 outLines.append("--- Predicting NOX based on CRIM, ZN, INDUS, CHAS, RM, AGE, DIS, RAD, TAX, PTRATIO, B, LSTAT, and MEDV with gradient descent ---\n")
 outLines.append(f"   Theta Vector               : {[theta[i][0] for i in range(len(theta))]}\n") # so that stuff prints on one line
 outLines.append(f"   Mean Squared Error (TRAINING DATA)   : {meanSquaredError(x, y, theta)}\n")
-x = np.array(validationData[["CRIM", "ZN", "INDUS", "CHAS", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT", "MEDV"]])
-y = np.array(validationData[["NOX"]])
+x = np.array(nValidationData[["CRIM", "ZN", "INDUS", "CHAS", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT", "MEDV"]])
+y = np.array(nValidationData[["NOX"]])
 outLines.append(f"   Mean Squared Error (VALIDATION DATA) : {meanSquaredError(x, y, theta)}\n")
 outLines.append("\n")
 outFile.writelines(outLines)
@@ -177,8 +179,8 @@ print()
 
 
 #MEDV predicition with AGE and TAX
-x = np.array(trainingData[["AGE", "TAX"]])
-y = np.array(trainingData[["MEDV"]])
+x = np.array(nTrainingData[["AGE", "TAX"]])
+y = np.array(nTrainingData[["MEDV"]])
 print("Performing gradient descent with x = AGE, TAX and y = MEDV")
 theta = gradientDescent(x,y)
 
@@ -187,23 +189,23 @@ outLines = []
 outLines.append("--- Predicting MEDV based on AGE and TAX with gradient descent ---\n")
 outLines.append(f"   Theta Vector               : {[theta[i][0] for i in range(len(theta))]}\n") # so that stuff prints on one line
 outLines.append(f"   Mean Squared Error (TRAINING DATA)   : {meanSquaredError(x, y, theta)}\n")
-x = np.array(validationData[["AGE", "TAX"]])
-y = np.array(validationData[["MEDV"]])
+x = np.array(nValidationData[["AGE", "TAX"]])
+y = np.array(nValidationData[["MEDV"]])
 outLines.append(f"   Mean Squared Error (VALIDATION DATA) : {meanSquaredError(x, y, theta)}\n")
 outLines.append("\n")
 outFile.writelines(outLines)
 
 #MEDV open form squared error prediction with validation set of 2 variables
-x = np.array(validationData[["AGE", "TAX"]])
-y = np.array(validationData[["MEDV"]])
+x = np.array(nValidationData[["AGE", "TAX"]])
+y = np.array(nValidationData[["MEDV"]])
 print(f"Open form Mean Squared Error, MEDV with 2 variables:     {meanSquaredError(x, y, theta)}")
 print()
 
 
 
 #MEDV prediction with all variables
-x = np.array(trainingData[["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT"]])
-y = np.array(trainingData[["MEDV"]])
+x = np.array(nTrainingData[["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT"]])
+y = np.array(nTrainingData[["MEDV"]])
 print("Performing gradient descent with x = CRIM, ZN, INDUS, CHAS, NOX, RM, AGE, DIS, RAD, TAX, PTRATIO, B, LSTAT y = MEDV")
 theta = gradientDescent(x,y)
 
@@ -212,48 +214,52 @@ outLines = []
 outLines.append("--- Predicting MEDV based on CRIM, ZN, INDUS, CHAS, NOX, RM, AGE, DIS, RAD, TAX, PTRATIO, B, and LSTAT with gradient descent ---\n")
 outLines.append(f"   Theta Vector               : {[theta[i][0] for i in range(len(theta))]}\n") # so that stuff prints on one line
 outLines.append(f"   Mean Squared Error (TRAINING DATA)   : {meanSquaredError(x, y, theta)}\n")
-x = np.array(validationData[["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT"]])
-y = np.array(validationData[["MEDV"]])
+x = np.array(nValidationData[["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT"]])
+y = np.array(nValidationData[["MEDV"]])
 outLines.append(f"   Mean Squared Error (VALIDATION DATA) : {meanSquaredError(x, y, theta)}\n")
 outLines.append("\n")
 outFile.writelines(outLines)
 
 #MEDV open form squared error prediction with validation set of all variables
-x = np.array(validationData[["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT"]])
-y = np.array(validationData[["MEDV"]])
+x = np.array(nValidationData[["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT"]])
+y = np.array(nValidationData[["MEDV"]])
 print(f"Open form Mean Squared Error, MEDV with 2 variables:     {meanSquaredError(x, y, theta)}")
 print()
 
 
 # NOX prediction with DIS and RAD using closed form solution
-x = np.array(trainingData[["DIS", "RAD"]])
-y = np.array(trainingData[["NOX"]])
+x = np.array(nTrainingData[["DIS", "RAD"]])
+y = np.array(nTrainingData[["NOX"]])
 theta = bestFit(x, y)
 
 outLines = []
 outLines.append("--- Predicting NOX based on DIS and RAD with closed form solution ---\n")
 outLines.append(f"   Theta Vector               : {[theta[i][0] for i in range(len(theta))]}\n") # so that stuff prints on one line
 outLines.append(f"   Mean Squared Error (TRAINING DATA)   : {meanSquaredError(x, y, theta)}\n")
-x = np.array(validationData[["DIS", "RAD"]])
-y = np.array(validationData[["NOX"]])
+x = np.array(nValidationData[["DIS", "RAD"]])
+y = np.array(nValidationData[["NOX"]])
 outLines.append(f"   Mean Squared Error (VALIDATION DATA) : {meanSquaredError(x, y, theta)}\n")
 outLines.append("\n")
 outFile.writelines(outLines)
 
 
 # MEDV prediction with AGE and TAX using closed form solution
-x = np.array(trainingData[["AGE", "TAX"]])
-y = np.array(trainingData[["MEDV"]])
+x = np.array(nTrainingData[["AGE", "TAX"]])
+y = np.array(nTrainingData[["MEDV"]])
 theta = bestFit(x, y)
 
 outLines = []
 outLines.append("--- Predicting MEDV based on AGE and TAX with closed form solution ---\n")
 outLines.append(f"   Theta Vector               : {[theta[i][0] for i in range(len(theta))]}\n") # so that stuff prints on one line
 outLines.append(f"   Mean Squared Error (TRAINING DATA)   : {meanSquaredError(x, y, theta)}\n")
-x = np.array(validationData[["AGE", "TAX"]])
-y = np.array(validationData[["MEDV"]])
+x = np.array(nValidationData[["AGE", "TAX"]])
+y = np.array(nValidationData[["MEDV"]])
 outLines.append(f"   Mean Squared Error (VALIDATION DATA) : {meanSquaredError(x, y, theta)}\n")
 outLines.append("\n")
 outFile.writelines(outLines)
+
+print("\n==================")
+print("WROTE DATA TO FILE")
+print("==================\n")
 
 outFile.close()
