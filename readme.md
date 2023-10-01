@@ -1,15 +1,15 @@
 This program was tested on Ubuntu (WSL) and Windows with Python 3.10
 
 This program depends on:
-    matplotlib
+    math
     numpy
     pandas
 
-data.txt is also required to be in the same directory as the source file as shown below:
+boston.txt is also required to be in the same directory as the source file as shown below:
 
 ```
 BenObryanHW1/
-├── data.txt
+├── boston.txt
 ├── linearRegression.py
 └── readme.md
 ```

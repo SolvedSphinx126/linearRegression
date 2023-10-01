@@ -1,6 +1,5 @@
 # Import necessary libraries
 import math
-import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
@@ -102,17 +101,22 @@ def gradientDescent(x, y):
         offsets = gradient(theta, ix, y)
         for i in range(0,len(theta)):
             theta[i] += offsets[i]
-    print(f"Iteration Count: {iterationCount}")
-    print(f"Cost         : {J(theta, ix, y)}")
-    print(f"Delta Thetas : {calcConvergence(prevTheta, theta)}")
-    print()
+    #print(f"Iteration Count: {iterationCount}")
+    print("Gradient descent completed:")
+    print(f"   Iterations  : {iterationCount}")
+    print(f"   Final Cost  : {J(theta, ix, y)[0]}")
+    print(f"   Convergence : (delta thetas) < (epsilon) : {calcConvergence(prevTheta, theta)[0]} < {epsilon}")
+    #print(f"Delta Thetas : {calcConvergence(prevTheta, theta)}")
     return theta
 
 #Calculates the squared error in the open form.
-def openSquaredError(x, y, theta):
+def meanSquaredError(x, y, theta):
     # Create a new list so as to not modify the one passed in
     ix = np.concatenate(((np.ones((x.shape[0], 1), dtype=x.dtype)), x), axis=1)
-    return J(theta, ix, y)
+    sum = 0
+    for i in range(len(ix)):
+        sum += (hypothesis(ix[i], theta) - y[i]) ** 2
+    return (1 / len(ix)) * sum
 
 # Return the theta vector that best fits the data
 def bestFit(x, y):
@@ -121,16 +125,31 @@ def bestFit(x, y):
     return np.matmul(np.matmul(np.linalg.inv(np.matmul(ix.T, ix)), ix.T), y)
 
 
+###################################################################################################
+#                                       START OF TEST CASES                                       #
+###################################################################################################
+
+
+outFile = open("Output.txt", "w")
+outLines = []
 
 #NOX theta prediction with DIS and RAD training sets
 x = np.array(trainingData[["DIS", "RAD"]])
 y = np.array(trainingData[["NOX"]])
+print("Performing gradient descent with x = DIS, RAD and y = NOX")
 theta = gradientDescent(x,y)
 
-#NOX open form squared error prediction with validation set of 2 variables
+outLines.append("--- Predicting NOX based on DIS and RAD with gradient descent ---\n")
+outLines.append(f"   Theta Vector               : {[theta[i][0] for i in range(len(theta))]}\n") # so that stuff prints on one line
+outLines.append(f"   Mean Squared Error (TRAINING DATA)   : {meanSquaredError(x, y, theta)}\n")
 x = np.array(validationData[["DIS", "RAD"]])
 y = np.array(validationData[["NOX"]])
-print(f"Open form Mean Squared Error, NOX with 2 variables:     {openSquaredError(x, y, theta)}")
+outLines.append(f"   Mean Squared Error (VALIDATION DATA) : {meanSquaredError(x, y, theta)}\n")
+outLines.append("\n")
+outFile.writelines(outLines)
+
+#NOX open form squared error prediction with validation set of 2 variables
+print(f"Open form Mean Squared Error, NOX with 2 variables:     {meanSquaredError(x, y, theta)}")
 print()
 
 
@@ -138,13 +157,21 @@ print()
 #NOX predicition with all variables
 x = np.array(trainingData[["CRIM", "ZN", "INDUS", "CHAS", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT", "MEDV"]])
 y = np.array(trainingData[["NOX"]])
+print("Performing gradient descent with x = CRIM, ZN, INDUS, CHAS, RM, AGE, DIS, RAD, TAX, PTRATIO, B, LSTAT, MEDV and y = NOX")
 theta = gradientDescent(x,y)
 
-#NOX open form squared error prediction with validation set of all variables
+outLines = []
+outLines.append("--- Predicting NOX based on CRIM, ZN, INDUS, CHAS, RM, AGE, DIS, RAD, TAX, PTRATIO, B, LSTAT, and MEDV with gradient descent ---\n")
+outLines.append(f"   Theta Vector               : {[theta[i][0] for i in range(len(theta))]}\n") # so that stuff prints on one line
+outLines.append(f"   Mean Squared Error (TRAINING DATA)   : {meanSquaredError(x, y, theta)}\n")
 x = np.array(validationData[["CRIM", "ZN", "INDUS", "CHAS", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT", "MEDV"]])
 y = np.array(validationData[["NOX"]])
-openSquaredError(x, y, theta)
-print(f"Open form Mean Squared Error, NOX with all variables:     {openSquaredError(x, y, theta)}")
+outLines.append(f"   Mean Squared Error (VALIDATION DATA) : {meanSquaredError(x, y, theta)}\n")
+outLines.append("\n")
+outFile.writelines(outLines)
+
+#NOX open form squared error prediction with validation set of all variables
+print(f"Open form Mean Squared Error, NOX with all variables:     {meanSquaredError(x, y, theta)}")
 print()
 
 
@@ -152,13 +179,24 @@ print()
 #MEDV predicition with AGE and TAX
 x = np.array(trainingData[["AGE", "TAX"]])
 y = np.array(trainingData[["MEDV"]])
+print("Performing gradient descent with x = AGE, TAX and y = MEDV")
 theta = gradientDescent(x,y)
+
+
+outLines = []
+outLines.append("--- Predicting MEDV based on AGE and TAX with gradient descent ---\n")
+outLines.append(f"   Theta Vector               : {[theta[i][0] for i in range(len(theta))]}\n") # so that stuff prints on one line
+outLines.append(f"   Mean Squared Error (TRAINING DATA)   : {meanSquaredError(x, y, theta)}\n")
+x = np.array(validationData[["AGE", "TAX"]])
+y = np.array(validationData[["MEDV"]])
+outLines.append(f"   Mean Squared Error (VALIDATION DATA) : {meanSquaredError(x, y, theta)}\n")
+outLines.append("\n")
+outFile.writelines(outLines)
 
 #MEDV open form squared error prediction with validation set of 2 variables
 x = np.array(validationData[["AGE", "TAX"]])
 y = np.array(validationData[["MEDV"]])
-openSquaredError(x, y, theta)
-print(f"Open form Mean Squared Error, MEDV with 2 variables:     {openSquaredError(x, y, theta)}")
+print(f"Open form Mean Squared Error, MEDV with 2 variables:     {meanSquaredError(x, y, theta)}")
 print()
 
 
@@ -166,11 +204,56 @@ print()
 #MEDV prediction with all variables
 x = np.array(trainingData[["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT"]])
 y = np.array(trainingData[["MEDV"]])
+print("Performing gradient descent with x = CRIM, ZN, INDUS, CHAS, NOX, RM, AGE, DIS, RAD, TAX, PTRATIO, B, LSTAT y = MEDV")
 theta = gradientDescent(x,y)
+
+
+outLines = []
+outLines.append("--- Predicting MEDV based on CRIM, ZN, INDUS, CHAS, NOX, RM, AGE, DIS, RAD, TAX, PTRATIO, B, and LSTAT with gradient descent ---\n")
+outLines.append(f"   Theta Vector               : {[theta[i][0] for i in range(len(theta))]}\n") # so that stuff prints on one line
+outLines.append(f"   Mean Squared Error (TRAINING DATA)   : {meanSquaredError(x, y, theta)}\n")
+x = np.array(validationData[["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT"]])
+y = np.array(validationData[["MEDV"]])
+outLines.append(f"   Mean Squared Error (VALIDATION DATA) : {meanSquaredError(x, y, theta)}\n")
+outLines.append("\n")
+outFile.writelines(outLines)
 
 #MEDV open form squared error prediction with validation set of all variables
 x = np.array(validationData[["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT"]])
 y = np.array(validationData[["MEDV"]])
-openSquaredError(x, y, theta)
-print(f"Open form Mean Squared Error, MEDV with 2 variables:     {openSquaredError(x, y, theta)}")
+print(f"Open form Mean Squared Error, MEDV with 2 variables:     {meanSquaredError(x, y, theta)}")
 print()
+
+
+# NOX prediction with DIS and RAD using closed form solution
+x = np.array(trainingData[["DIS", "RAD"]])
+y = np.array(trainingData[["NOX"]])
+theta = bestFit(x, y)
+
+outLines = []
+outLines.append("--- Predicting NOX based on DIS and RAD with closed form solution ---\n")
+outLines.append(f"   Theta Vector               : {[theta[i][0] for i in range(len(theta))]}\n") # so that stuff prints on one line
+outLines.append(f"   Mean Squared Error (TRAINING DATA)   : {meanSquaredError(x, y, theta)}\n")
+x = np.array(validationData[["DIS", "RAD"]])
+y = np.array(validationData[["NOX"]])
+outLines.append(f"   Mean Squared Error (VALIDATION DATA) : {meanSquaredError(x, y, theta)}\n")
+outLines.append("\n")
+outFile.writelines(outLines)
+
+
+# MEDV prediction with AGE and TAX using closed form solution
+x = np.array(trainingData[["AGE", "TAX"]])
+y = np.array(trainingData[["MEDV"]])
+theta = bestFit(x, y)
+
+outLines = []
+outLines.append("--- Predicting MEDV based on AGE and TAX with closed form solution ---\n")
+outLines.append(f"   Theta Vector               : {[theta[i][0] for i in range(len(theta))]}\n") # so that stuff prints on one line
+outLines.append(f"   Mean Squared Error (TRAINING DATA)   : {meanSquaredError(x, y, theta)}\n")
+x = np.array(validationData[["AGE", "TAX"]])
+y = np.array(validationData[["MEDV"]])
+outLines.append(f"   Mean Squared Error (VALIDATION DATA) : {meanSquaredError(x, y, theta)}\n")
+outLines.append("\n")
+outFile.writelines(outLines)
+
+outFile.close()
